@@ -1,0 +1,31 @@
+# Environment
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Database
+*.db
+*.sqlite3
+data/*.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/node_modules/
+
+# OS
+.DS_Store

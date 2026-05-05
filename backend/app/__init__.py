@@ -1,0 +1,1 @@
+"""SoloMiro FastAPI application package."""

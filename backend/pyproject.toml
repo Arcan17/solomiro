@@ -1,0 +1,23 @@
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+exclude = '''
+/(
+    \.git
+  | alembic
+  | \.venv
+)/
+'''
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+exclude = ["alembic", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.backends.legacy:build"
