@@ -16,11 +16,9 @@ SoloMiro is an AI-powered car advisor built for the Chilean market. You enter yo
 
 ## Screenshots
 
-| Advisor Form | Recommendation Result |
-|---|---|
-| *(add screenshot here — `/advisor` page)* | *(add screenshot here — `/result` page)* |
-
-> **To add screenshots:** Run the app locally, take screenshots of the `/advisor` and `/result` pages, and save them to `docs/screenshots/`. Then replace the placeholder text above with `![Advisor](docs/screenshots/advisor.png)`.
+| Landing | Step 1 — Your car | Step 2 — Your goals |
+|---|---|---|
+| ![Landing](docs/screenshots/home.png) | ![Advisor Step 1](docs/screenshots/advisor.png) | ![Advisor Step 2](docs/screenshots/advisor-step2.png) |
 
 ---
 
