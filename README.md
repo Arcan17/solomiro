@@ -1,11 +1,41 @@
 # SoloMiro
 
-![CI](https://img.shields.io/github/actions/workflow/status/your-org/solomiro/ci.yml?label=CI)
-![Python 3.11](https://img.shields.io/badge/python-3.11-blue)
-![Next.js 14](https://img.shields.io/badge/Next.js-14-black)
+![CI](https://img.shields.io/github/actions/workflow/status/Arcan17/solomiro/ci.yml?label=CI&logo=github)
+![Python 3.11](https://img.shields.io/badge/python-3.11-blue?logo=python&logoColor=white)
+![Next.js 14](https://img.shields.io/badge/Next.js-14-black?logo=next.js)
 ![License MIT](https://img.shields.io/badge/license-MIT-green)
+![Status](https://img.shields.io/badge/status-active-brightgreen)
 
-**AI-powered car advisor for Chile.** Tell SoloMiro what car you have and what you want to improve. In under one minute, it tells you whether switching makes sense and which car is your best option.
+> **¿Conviene cambiar mi auto?** SoloMiro responde esa pregunta en menos de un minuto.
+
+SoloMiro is an AI-powered car advisor built for the Chilean market. You enter your current car (fuel type, weekly usage, city, maintenance costs) and what you'd like to improve (lower fuel cost, less maintenance, EV). The app calculates the real total cost of ownership, scores candidates from a curated Chilean catalog, and delivers a personalized recommendation — including the payback period if you switch.
+
+**The problem it solves:** Most Chileans make car-switching decisions based on sticker price alone, ignoring fuel cost differences, patente, insurance, and maintenance. SoloMiro turns that into a data-driven decision backed by AI analysis.
+
+---
+
+## Screenshots
+
+| Advisor Form | Recommendation Result |
+|---|---|
+| *(add screenshot here — `/advisor` page)* | *(add screenshot here — `/result` page)* |
+
+> **To add screenshots:** Run the app locally, take screenshots of the `/advisor` and `/result` pages, and save them to `docs/screenshots/`. Then replace the placeholder text above with `![Advisor](docs/screenshots/advisor.png)`.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 14 (App Router), Tailwind CSS |
+| Backend | FastAPI, Python 3.11 |
+| AI | Anthropic Claude / OpenAI GPT-4o / Google Gemini (switchable) |
+| ORM | SQLAlchemy 2.0 + Alembic |
+| Database | PostgreSQL (Docker) / SQLite (local dev) |
+| Testing | pytest, 21 tests, MockAIProvider (no API calls) |
+| CI/CD | GitHub Actions |
+| Containerization | Docker + Docker Compose |
 
 ---
 
@@ -21,10 +51,12 @@ User Browser
      ▼
 [FastAPI Backend]
      ├── CarRecommender (scoring + filtering)
-     ├── Calculator (costs, savings, payback)
-     ├── AI Service (Anthropic/OpenAI/Gemini)
+     ├── Calculator (costs, savings, payback period)
+     ├── AI Service (Anthropic / OpenAI / Gemini)
      └── PostgreSQL (recommendations + leads)
 ```
+
+The AI provider is abstracted behind a single interface — switching from Claude to GPT-4o is a one-line environment variable change.
 
 ---
 
@@ -34,18 +66,17 @@ User Browser
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/your-org/solomiro.git
+git clone https://github.com/Arcan17/solomiro.git
 cd solomiro
 
-# 2. Add your API key to backend/.env
+# 2. Add your API key
 cp backend/.env.example backend/.env
-# Edit backend/.env and set AI_API_KEY=sk-ant-...
-# Also change DATABASE_URL to the postgres URL if using docker-compose
+# Edit backend/.env → set AI_API_KEY=your-key-here
 
-# 3. Start services
+# 3. Start everything
 docker compose up --build
 
-# 4. Visit http://localhost:3000 (or run the frontend separately)
+# 4. Open http://localhost:3000
 ```
 
 ### Local development
@@ -56,14 +87,13 @@ docker compose up --build
 cd backend
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env  # then fill in AI_API_KEY
+cp .env.example .env       # fill in AI_API_KEY
 mkdir -p data
 alembic upgrade head
 uvicorn app.main:app --reload --port 8000
 ```
 
-The API will be available at <http://localhost:8000>.
-Interactive docs: <http://localhost:8000/docs>
+API available at `http://localhost:8000` — interactive docs at `http://localhost:8000/docs`
 
 #### Frontend
 
@@ -73,58 +103,64 @@ npm install
 NEXT_PUBLIC_API_URL=http://localhost:8000 npm run dev
 ```
 
-The frontend will be available at <http://localhost:3000>.
+Frontend available at `http://localhost:3000`
 
 ---
 
-## Environment variables
+## Environment Variables
 
 | Variable | Default | Description |
 |---|---|---|
-| `DATABASE_URL` | `sqlite:///./data/solomiro.db` | SQLAlchemy connection string |
 | `AI_PROVIDER` | `anthropic` | AI backend: `anthropic`, `openai`, `gemini` |
-| `AI_API_KEY` | *(empty)* | API key for the selected AI provider |
+| `AI_API_KEY` | *(required)* | API key for the selected provider |
 | `AI_MODEL` | `claude-sonnet-4-5` | Model ID to use |
+| `DATABASE_URL` | `sqlite:///./data/solomiro.db` | SQLAlchemy connection string |
 | `ALLOWED_ORIGINS` | `http://localhost:3000` | Comma-separated CORS origins |
-| `LOG_LEVEL` | `INFO` | Python logging level |
 | `FUEL_PRICE_95` | `1100` | CLP per litre of 95-octane gasoline |
 | `FUEL_PRICE_DIESEL` | `1050` | CLP per litre of diesel |
 | `FUEL_PRICE_KWH` | `120` | CLP per kWh of electricity |
+| `LOG_LEVEL` | `INFO` | Python logging level |
+
+### Getting an API Key
+
+| Provider | How to get it |
+|---|---|
+| **Anthropic** (default) | [console.anthropic.com](https://console.anthropic.com) → API Keys |
+| **OpenAI** | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) |
+| **Gemini** | [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey) |
 
 ---
 
-## How to get API keys
+## Running Tests
 
-### Anthropic (default)
-1. Go to <https://console.anthropic.com>
-2. Navigate to **API Keys** and create a new key.
-3. Set `AI_PROVIDER=anthropic` and `AI_API_KEY=sk-ant-...`
-4. Set `AI_MODEL=claude-sonnet-4-5` (or another Claude model)
-
-### OpenAI
-1. Go to <https://platform.openai.com/api-keys>
-2. Create a new secret key.
-3. Set `AI_PROVIDER=openai`, `AI_API_KEY=sk-...`, `AI_MODEL=gpt-4o`
-
-### Gemini
-1. Go to <https://aistudio.google.com/app/apikey>
-2. Create an API key.
-3. Set `AI_PROVIDER=gemini`, `AI_API_KEY=AIza...`, `AI_MODEL=gemini-1.5-pro`
-
----
-
-## Running tests
+All 21 tests run with SQLite in-memory and a `MockAIProvider` — no external API calls, no token required.
 
 ```bash
 cd backend
-pip install -r requirements.txt
 pytest tests/ -v
 ```
 
-All 21 tests run with SQLite in-memory and a `MockAIProvider`. No external API calls are made.
+```
+tests/test_calculator.py   — 7 tests   (cost calculations, payback period)
+tests/test_recommender.py  — 8 tests   (filtering, scoring, full pipeline)
+tests/test_api.py          — 6 tests   (HTTP endpoints, DB persistence)
 
+21 passed in ~1s
 ```
-tests/test_calculator.py   — 7 tests  (cost calculations)
-tests/test_recommender.py  — 8 tests  (filtering, scoring, recommend pipeline)
-tests/test_api.py          — 6 tests  (HTTP endpoints, DB persistence)
-```
+
+---
+
+## Roadmap
+
+- [ ] Add real car catalog (from MercadoLibre Chile listings)
+- [ ] Deploy public demo (Vercel + Railway)
+- [ ] Add comparison mode (side-by-side two candidates)
+- [ ] Add shareable result links
+- [ ] Spanish-language UI strings
+- [ ] User accounts for saved recommendations
+
+---
+
+## License
+
+MIT
